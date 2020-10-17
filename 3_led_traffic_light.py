@@ -1,36 +1,37 @@
 import RPi.GPIO as GPIO
 import time
 
-GPIO.setmode(GPIO.BOARD)
-GREEN_LED_PIN =12
-GPIO.setup(GREEN_LED_PIN, GPIO.OUT)
-YELLOW_LED_PIN =16
-GPIO.setup(YELLOW_LED_PIN, GPIO.OUT)
-RED_LED_PIN =18
-GPIO.setup(RED_LED_PIN, GPIO.OUT)
+class TrafficLight:
+    def __init__(self, name, pin, duration):
+        self.name = name
+        self.pin = pin
+        self.duration = duration
+        GPIO.setup(self.pin, GPIO.OUT)
 
-try:
-    while True:
-        print("green")
-        GPIO.output(GREEN_LED_PIN, GPIO.HIGH)
-        time.sleep(4)
-        GPIO.output(GREEN_LED_PIN, GPIO.LOW)
+    def run(self):
+        GPIO.output(self.pin, GPIO.HIGH)
+        time.sleep(self.duration)
+        GPIO.output(self.pin, GPIO.LOW)
 
-        print("yellow")
-        GPIO.output(YELLOW_LED_PIN, GPIO.HIGH)
-        time.sleep(2)
-        GPIO.output(YELLOW_LED_PIN, GPIO.LOW)
-    
-        print("red")
-        GPIO.output(RED_LED_PIN, GPIO.HIGH)
-        time.sleep(4)
-        GPIO.output(RED_LED_PIN, GPIO.LOW)
-        #print("LED is off")
-        #GPIO.output(GREEN_LED_PIN, GPIO.LOW)
-        #time.sleep(1)
+def init(traffic_light_list):
+    GPIO.setmode(GPIO.BOARD)
+    traffic_light_list.append(TrafficLight("GREEN_LED_PIN", 12, 4))
+    traffic_light_list.append(TrafficLight("YELLOW_LED_PIN", 16, 2))
+    traffic_light_list.append(TrafficLight("RED_LED_PIN", 18, 4))
 
-except KeyboardInterrupt:
-    print("Exception: keyboard interrupt")
+def main():
+    traffic_light_list = list()
+    init(traffic_light_list)
+    try:
+        while True:
+            for traffic_light in traffic_light_list:
+                traffic_light.run()
 
-finally:
-    GPIO.cleanup()
+    except KeyboardInterrupt:
+        print("Exception: keyboard interrupt")
+
+    finally:
+        GPIO.cleanup()
+
+if __name__ == "__main__":
+    main()
